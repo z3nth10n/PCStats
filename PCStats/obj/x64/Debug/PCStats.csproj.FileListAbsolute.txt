@@ -1,0 +1,1 @@
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\bin\x64\Debug\PCStats.exe.config

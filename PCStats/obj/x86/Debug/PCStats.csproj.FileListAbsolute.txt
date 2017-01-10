@@ -1,0 +1,8 @@
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\bin\x86\Debug\PCStats.exe.config
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\bin\x86\Debug\PCStats.exe
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\bin\x86\Debug\PCStats.pdb
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x86\Debug\PCStats.Form1.resources
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x86\Debug\PCStats.Properties.Resources.resources
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x86\Debug\PCStats.csproj.GenerateResource.Cache
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x86\Debug\PCStats.exe
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x86\Debug\PCStats.pdb

@@ -1,0 +1,11 @@
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\bin\x64\Release\PCStats.exe.config
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\bin\x64\Release\PCStats.exe
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\bin\x64\Release\PCStats.pdb
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x64\Release\PCStats.Form1.resources
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x64\Release\PCStats.Properties.Resources.resources
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x64\Release\PCStats.csproj.GenerateResource.Cache
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x64\Release\PCStats.exe
+C:\Users\Usuario\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x64\Release\PCStats.pdb
+C:\Users\Alvaro\Documents\Visual Studio 2015\Projects\PCStats\PCStats\bin\x64\Release\PCStats.exe.config
+C:\Users\Alvaro\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x64\Release\PCStats.exe
+C:\Users\Alvaro\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\x64\Release\PCStats.pdb
