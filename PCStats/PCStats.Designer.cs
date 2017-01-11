@@ -1,6 +1,6 @@
 ﻿namespace PCStats
 {
-    partial class Form1
+    partial class PCStats
     {
         /// <summary>
         /// Variable del diseñador necesaria.

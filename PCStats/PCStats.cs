@@ -14,7 +14,7 @@ using System.IO;
 
 namespace PCStats
 {
-    public partial class Form1 : Form
+    public partial class PCStats : Form
     {
         private static IKeyboardMouseEvents m_GlobalHook;
         private static long keyPressed, total, overticks, cheatedTicks, lastcTick;
@@ -27,9 +27,9 @@ namespace PCStats
         private static string aPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         private static int[,] mouse;
         private static string testFile = Path.Combine(aPath, "test.txt");
-        private static Dictionary<Keys, ulong> keysDB = new Dictionary<Keys, ulong>();
+        private static Dictionary<Keys, KeyInfo> keysDB = new Dictionary<Keys, KeyInfo>();
         private static Dictionary<Keys, ToolTip> tooltipKey = new Dictionary<Keys, ToolTip>();
-        private static ulong maxKeyPress;
+        public static ulong maxKeyPress;
 
         private static Rectangle ScreenSize
         {
@@ -57,7 +57,7 @@ namespace PCStats
         [DllImport("gdi32", EntryPoint = "BitBlt", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
         private static extern int BitBlt(int hDestDC, int x, int y, int nWidth, int nHeight, int hSrcDC, int xSrc, int ySrc, int dwRop);
 
-        public Form1()
+        public PCStats()
         {
             InitializeComponent();
         }
@@ -89,12 +89,8 @@ namespace PCStats
         private void FormKey_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.DrawImage(Image.FromFile(Path.Combine(aPath, "keyboard.png")), new Rectangle(0, 0, 950, 268));
-            //e.Graphics.FillEllipse(new SolidBrush(Color.FromArgb(128, Color.Black)), new Rectangle(0, 0, 150, 150));
-            foreach (KeyValuePair<Keys, ulong> key in keysDB)
-            { //if(keysDB.ContainsKey(key))
-                e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb((int)(key.Value / maxKeyPress * 240), Color.Red)), KeysManager.GetRectangle(key.Key));
-                //MessageBox.Show(key.Key.ToString() + ": " + KeysManager.GetRectangle(key.Key).ToString() + " (Used: " + key.Value + " times)");
-            }
+            foreach (KeyValuePair<Keys, KeyInfo> key in keysDB)
+                e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb((int)(key.Value.timesPressed / maxKeyPress * 240), Color.Red)), KeysManager.GetRectangle(key.Key));
         }
 
         private void FormMouse_Load(object sender, EventArgs e)
@@ -104,8 +100,6 @@ namespace PCStats
             Rectangle position = new Rectangle(0, 0, ScreenSize.Width, ScreenSize.Height);
 
             var pb = new PictureBox();
-            //pb.Image = GetMouseActivity(position); //Image.FromFile(Path.Combine(aPath, "test.png"));
-            //pb.Size = new Size(ScreenSize.Width, ScreenSize.Height);
             pb.BackColor = Color.Transparent;
 
             // Determine the Width and Height of the splash form
@@ -142,7 +136,7 @@ namespace PCStats
 
         private void FormKey_Load(object sender, EventArgs e)
         {
-            //Form main = (Form)sender; //Nothing to do here yet
+            //Nothing to do here yet
         }
 
         private Bitmap GetMouseActivity(Rectangle r, Bitmap bo)
@@ -206,7 +200,7 @@ namespace PCStats
             f.Size = new Size(950, 300);
 
             if(keysDB.Count > 0)
-                maxKeyPress = keysDB.Values.Max();
+                maxKeyPress = keysDB.Select(x => x.Value.timesPressed).Max();
             if (maxKeyPress == 0)
                 ++maxKeyPress;
 
@@ -217,7 +211,6 @@ namespace PCStats
             keyboard.Location = new Point(0, 0);
 
             keyboard.Paint += Keyboard_Paint;
-            //keyboard.MouseMove += Keyboard_MouseMove;
 
             f.Controls.Add(keyboard);
 
@@ -248,9 +241,8 @@ namespace PCStats
                 if (!tooltipKey.ContainsKey(key))
                     tooltipKey[key] = new ToolTip();
 
-                //tip.ShowAlways = true;
-                Rectangle r = KeysManager.keyPositions[key]; //Get tooltip from keyinfo
-                tooltipKey[key].Show("My tooltip", (TransparentPanel)sender, new Point(r.X, r.Y));
+                tooltipKey[key].ShowAlways = true;
+                tooltipKey[key].Show(keysDB.ContainsKey(key) ? keysDB[key].GetToolTip() : "Key wasn't pressed yet.", (TransparentPanel)sender, new Point(KeysManager.keySize, KeysManager.keySize / 2));
             }
         }
 
@@ -264,19 +256,16 @@ namespace PCStats
         protected void Keyboard_Paint(object sender, PaintEventArgs e)
         {
             PictureBox o = (PictureBox)sender;
-            foreach (KeyValuePair<Keys, ulong> key in keysDB)
+            foreach (KeyValuePair<Keys, KeyInfo> key in keysDB)
             {
                 Rectangle r = KeysManager.GetRectangle(key.Key);
                 if(new Rectangle(0, 0, o.Width, o.Height).Contains(r.X, r.Y))
-                    e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb((int)(key.Value * 225 / maxKeyPress), Color.Red)), r);
+                    e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb((int)(key.Value.timesPressed * 225 / maxKeyPress), Color.Red)), r);
             }
         }
 
         protected void Keyboard_MouseMove(object sender, MouseEventArgs e)
         {
-            //ToolTip tip = new ToolTip();
-            //tip.ShowAlways = true;
-            //tip.Show("My tooltip", (PictureBox)sender, Cursor.Position.X, Cursor.Position.Y);
             Point mousePos = e.Location;
             if (KeysManager.IsKey(mousePos))
             {
@@ -355,8 +344,15 @@ namespace PCStats
         {
             ++keyPressed;
             if (!keysDB.ContainsKey(e.KeyCode))
-                keysDB.Add(e.KeyCode, 0);
-            ++keysDB[e.KeyCode];
+                keysDB.Add(e.KeyCode, new KeyInfo(e.KeyCode));
+            ++keysDB[e.KeyCode].timesPressed;
+            keysDB[e.KeyCode].whenPressed.Add(DateTime.Now);
+            if (ModifierKeys != Keys.None)
+            {
+                if (!keysDB[e.KeyCode].modPressed.Keys.Any(x => x.key == ModifierKeys))
+                    keysDB[e.KeyCode].modPressed.Add(new ModifierKey(ModifierKeys), 0);
+                keysDB[e.KeyCode].IncrMod(ModifierKeys);
+            }
         }
 
         private static double GetDistance(Point p1, Point p2)
@@ -377,13 +373,48 @@ namespace PCStats
     }
     public class KeyInfo
     {
+        public KeyInfo(Keys k)
+        {
+            key = k;
+        }
         public Keys key = Keys.None;
         public ulong timesPressed = 0, modifierKeys = 0;
         public List<DateTime> whenPressed = new List<DateTime>();
         public Dictionary<ModifierKey, ulong> modPressed = new Dictionary<ModifierKey, ulong>();
+        public ModifierKey GetMod(Keys k)
+        {
+            return modPressed.Keys.FirstOrDefault(x => x.key == k);
+        }
+        public void IncrMod(Keys k)
+        {
+            ulong v = modPressed.FirstOrDefault(x => x.Key.key == key).Value;
+            SetMod(k, ++v);
+        }
+        public void SetMod(Keys k, ulong value)
+        {
+            ModifierKey rmk = new ModifierKey(k);
+            foreach(ModifierKey mk in modPressed.Keys)
+                if (mk.key == k)
+                { 
+                    rmk = mk;
+                    break;
+                }
+            rmk.whenPressed.Add(DateTime.Now);
+            modPressed.Remove(GetMod(k));
+            modPressed.Add(rmk, value);
+        }
+        public string GetToolTip()
+        { //Create method for the name of the keys
+            string t = (DateTime.Now - whenPressed.Last()).ToString(@"d\d\ hh\h\ mm\m\ ss\s").TrimStart(' ', 'd', 'h', 'm', 's', '0');
+            return string.Format("[Key '{0}']: {1} times pressed ({4:F2}%)\n{2} mod keys pressed within it.\nPressed {3} ago.", key.ToString(), timesPressed, modifierKeys, t, timesPressed * 1d / PCStats.maxKeyPress);
+        }
     }
     public class ModifierKey
     {
+        public ModifierKey(Keys k)
+        {
+            key = k;
+        }
         public Keys key = Keys.None;
         public List<DateTime> whenPressed = new List<DateTime>();
     }

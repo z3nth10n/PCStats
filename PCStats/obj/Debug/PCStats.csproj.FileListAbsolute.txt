@@ -25,6 +25,6 @@ C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\ob
 C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\bin\Debug\PCStats.exe
 C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\bin\Debug\PCStats.pdb
 C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\Debug\PCStats.csprojResolveAssemblyReference.cache
-C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\Debug\PCStats.Form1.resources
 C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\Debug\PCStats.Properties.Resources.resources
 C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\Debug\PCStats.csproj.GenerateResource.Cache
+C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\Debug\PCStats.PCStats.resources
