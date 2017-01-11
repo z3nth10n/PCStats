@@ -11,12 +11,28 @@ namespace PCStats
     class KeysManager
     {
         //public Keys k = Keys.None;
+        public static Dictionary<Keys, Rectangle> keyPositions = new Dictionary<Keys, Rectangle>();
+        public const int keySize = 33;
+        public static void GetPositions()
+        {
+            foreach (Keys key in Enum.GetValues(typeof(Keys)))
+                if(!keyPositions.ContainsKey(key))
+                    keyPositions.Add(key, GetRectangle(key));
+        }
+        public static bool IsKey(Point p)
+        {
+            return keyPositions.Values.Any(x => x.Contains(p.X, p.Y));
+        }
+        public static Keys GetKey(Rectangle r)
+        {
+            return keyPositions.ContainsValue(r) ? keyPositions.FirstOrDefault(x => x.Value == r).Key : Keys.None;
+        }
         public static Rectangle GetRectangle(Keys k)
         {
             Keys[] firstRow = new Keys[] { Keys.Q, Keys.W, Keys.E, Keys.R, Keys.T, Keys.Y, Keys.U, Keys.I, Keys.O, Keys.P },
                    secondRow = new Keys[] { Keys.A, Keys.S, Keys.D, Keys.F, Keys.G, Keys.H, Keys.J, Keys.K, Keys.L },
                    thirdRow = new Keys[] { Keys.Z, Keys.X, Keys.C, Keys.V, Keys.B, Keys.N, Keys.M };
-            int startY = 61, startX = 77; //Only for this stage
+            int startY = 101, startX = 77; //Only for this stage
             if (firstRow.Contains(k))
                 startX += 40 * Array.IndexOf(firstRow, k);
             else if(secondRow.Contains(k))
@@ -26,10 +42,10 @@ namespace PCStats
             }
             else if(thirdRow.Contains(k))
             {
-                startX += 79;
-                startY += 40 * Array.IndexOf(thirdRow, k) + 29;
+                startY += 79;
+                startX += 40 * Array.IndexOf(thirdRow, k) + 29;
             }
-            return firstRow.Union(secondRow).Union(thirdRow).Contains(k) ? new Rectangle(startX, startY, 33, 33) : new Rectangle(0, 0, 0, 0);
+            return firstRow.Union(secondRow).Union(thirdRow).Contains(k) ? new Rectangle(startX, startY, keySize, keySize) : new Rectangle(0, 0, 0, 0);
         }
         public static Rectangle GetRectangleBeta(Keys k)
         {

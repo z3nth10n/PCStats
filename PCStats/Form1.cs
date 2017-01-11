@@ -28,6 +28,7 @@ namespace PCStats
         private static int[,] mouse;
         private static string testFile = Path.Combine(aPath, "test.txt");
         private static Dictionary<Keys, ulong> keysDB = new Dictionary<Keys, ulong>();
+        private static Dictionary<Keys, ToolTip> tooltipKey = new Dictionary<Keys, ToolTip>();
         private static ulong maxKeyPress;
 
         private static Rectangle ScreenSize
@@ -66,7 +67,6 @@ namespace PCStats
             m_GlobalHook = Hook.GlobalEvents();
 
             m_GlobalHook.MouseMoveExt += ExtMouseMoved;
-            //m_GlobalHook.KeyPress += ExtKeyPress;
             m_GlobalHook.KeyDown += ExtKeyPress;
 
             mouse = new int[ScreenSize.Width, ScreenSize.Height];
@@ -80,6 +80,8 @@ namespace PCStats
 
             Console.WriteLine(dpi);
             Console.WriteLine(GetMouseSpeed());
+
+            KeysManager.GetPositions();
 
             counting = true;
         }
@@ -122,13 +124,6 @@ namespace PCStats
                 BufferGraphics.ReleaseHdc(BufferGraphicsDC);
 
                 newPic = GetMouseActivity(position, BufferBitmap);
-
-                // Draw the PNG image over the desktop screenshot
-                //BufferGraphics.DrawImage(pb.Image, position.X, position.Y, position.Width, position.Height);
-
-                // Draw some text -- this is where some product license info could be drawn on the splash picture
-                //using (SolidBrush TextBrush = new SolidBrush(ForeColor))
-                //    BufferGraphics.DrawString(Application.ProductVersion, Font, TextBrush, 25, 40);
             }
 
             // Put the final result into the PictureBox_SplashImage which will cover the entire splash form
@@ -147,14 +142,7 @@ namespace PCStats
 
         private void FormKey_Load(object sender, EventArgs e)
         {
-            Form main = (Form)sender;
-
-            /*var pb = new PictureBox();
-            
-            pb.Size = new Size(main.Size.Width, main.Size.Height);
-            pb.Image = Image.FromFile(Path.Combine(aPath, "keyboard.png"));
-
-            main.Controls.Add(pb);*/
+            //Form main = (Form)sender; //Nothing to do here yet
         }
 
         private Bitmap GetMouseActivity(Rectangle r, Bitmap bo)
@@ -168,7 +156,6 @@ namespace PCStats
                 for (int j = 0; j < r.Height; ++j)
                 {
                     b.SetPixel(i, j, Interpolate(bo.GetPixel(i, j), Color.Red, Clamp(mouse[i, j] / (double)maxNum, 0, 1))); //new Color(255, 0, 0, mouse[i, j] * 255 / maxNum)
-                    //b.SetPixel(i, j, Color.FromArgb((int)Clamp((int)Math.Round(mouse[i, j] * 255 / (double)maxNum), 0, 255), Color.Red));
                     sb.Append(string.Format("{0}x{1}: {2} ({3:F2})", i, j, mouse[i, j], mouse[i, j] / (double)maxNum) + Environment.NewLine);
                 }
             File.WriteAllText(testFile, sb.ToString());
@@ -214,28 +201,94 @@ namespace PCStats
             Form f = new Form();
             f.Load += FormKey_Load;
             f.BackColor = Color.White;
-            //f.TransparencyKey = Color.Transparent;
-            //f.FormBorderStyle = FormBorderStyle.None;
             f.Bounds = Screen.PrimaryScreen.Bounds;
             f.TopMost = true;
             f.Size = new Size(950, 300);
-
-            f.Paint += FormKey_Paint;
 
             if(keysDB.Count > 0)
                 maxKeyPress = keysDB.Values.Max();
             if (maxKeyPress == 0)
                 ++maxKeyPress;
 
-            //foreach (KeyValuePair<Keys, ulong> key in keysDB)
-            //    MessageBox.Show(key.Key.ToString() + ": " + KeysManager.GetRectangle(key.Key).ToString() + " (Used: " + key.Value + " times)");
+            PictureBox keyboard = new PictureBox();
+
+            keyboard.Image = Image.FromFile(Path.Combine(aPath, "keyboard.png"));
+            keyboard.Size = new Size(950, 268);
+            keyboard.Location = new Point(0, 0);
+
+            keyboard.Paint += Keyboard_Paint;
+            //keyboard.MouseMove += Keyboard_MouseMove;
+
+            f.Controls.Add(keyboard);
+
+            foreach (KeyValuePair<Keys, Rectangle> kp in KeysManager.keyPositions)
+                if (kp.Value != Rectangle.Empty)
+                {
+                    TransparentPanel pnl = new TransparentPanel();
+
+                    pnl.Size = new Size(KeysManager.keySize, KeysManager.keySize);
+                    pnl.Location = new Point(kp.Value.X, kp.Value.Y);
+
+                    pnl.Name = kp.Key.ToString();
+
+                    pnl.MouseEnter += Panel_Enter;
+                    pnl.MouseLeave += Panel_Leave;
+
+                    keyboard.Controls.Add(pnl);
+                }
 
             f.ShowDialog();
         }
 
-        protected void BackgroundFill(object o, PaintEventArgs e)
+        protected void Panel_Enter(object sender, EventArgs e)
         {
-            e.Graphics.FillRectangle(Brushes.Transparent, ((Form)o).ClientRectangle);
+            Keys key = Keys.None;
+            if (Enum.TryParse(((TransparentPanel)sender).Name, out key)) 
+            {
+                if (!tooltipKey.ContainsKey(key))
+                    tooltipKey[key] = new ToolTip();
+
+                //tip.ShowAlways = true;
+                Rectangle r = KeysManager.keyPositions[key]; //Get tooltip from keyinfo
+                tooltipKey[key].Show("My tooltip", (TransparentPanel)sender, new Point(r.X, r.Y));
+            }
+        }
+
+        protected void Panel_Leave(object sender, EventArgs e)
+        {
+            Keys key = Keys.None;
+            if (Enum.TryParse(((TransparentPanel)sender).Name, out key) && tooltipKey.ContainsKey(key))
+                    tooltipKey[key].Hide((TransparentPanel)sender);
+        }
+
+        protected void Keyboard_Paint(object sender, PaintEventArgs e)
+        {
+            PictureBox o = (PictureBox)sender;
+            foreach (KeyValuePair<Keys, ulong> key in keysDB)
+            {
+                Rectangle r = KeysManager.GetRectangle(key.Key);
+                if(new Rectangle(0, 0, o.Width, o.Height).Contains(r.X, r.Y))
+                    e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb((int)(key.Value * 225 / maxKeyPress), Color.Red)), r);
+            }
+        }
+
+        protected void Keyboard_MouseMove(object sender, MouseEventArgs e)
+        {
+            //ToolTip tip = new ToolTip();
+            //tip.ShowAlways = true;
+            //tip.Show("My tooltip", (PictureBox)sender, Cursor.Position.X, Cursor.Position.Y);
+            Point mousePos = e.Location;
+            if (KeysManager.IsKey(mousePos))
+            {
+                ToolTip tt = new ToolTip();
+                IWin32Window win = this;
+                tt.Show("String", (PictureBox)sender, mousePos);
+            }
+        }
+
+        protected void BackgroundFill(object sender, PaintEventArgs e)
+        {
+            e.Graphics.FillRectangle(Brushes.Transparent, ((Form)sender).ClientRectangle);
         }
 
         private void menu1_Click(object sender, EventArgs e)
@@ -298,12 +351,6 @@ namespace PCStats
             realLastPos = mousePos;
         }
 
-        /*public void ExtKeyPress(object sender, KeyPressEventArgs e)
-        {
-            ++keyPressed;
-            //label2.Text = string.Format("Key pressed: {0}, Last Key Pressed: {1}", keyPressed, e.KeyChar);
-        }*/
-
         public void ExtKeyPress(object sender, KeyEventArgs e)
         {
             ++keyPressed;
@@ -326,6 +373,34 @@ namespace PCStats
                 new IntPtr(&speed),
                 0);
             return speed;
+        }
+    }
+    public class KeyInfo
+    {
+        public Keys key = Keys.None;
+        public ulong timesPressed = 0, modifierKeys = 0;
+        public List<DateTime> whenPressed = new List<DateTime>();
+        public Dictionary<ModifierKey, ulong> modPressed = new Dictionary<ModifierKey, ulong>();
+    }
+    public class ModifierKey
+    {
+        public Keys key = Keys.None;
+        public List<DateTime> whenPressed = new List<DateTime>();
+    }
+    public class TransparentPanel : Panel
+    {
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x00000020; // WS_EX_TRANSPARENT
+                return cp;
+            }
+        }
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            //base.OnPaintBackground(e);
         }
     }
 }
