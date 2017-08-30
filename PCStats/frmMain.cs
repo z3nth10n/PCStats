@@ -9,6 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Reflection;
 using System.IO;
+using static PCStats.InteroperabilityAPI;
 
 namespace PCStats
 {
@@ -24,44 +25,13 @@ namespace PCStats
         private static bool counting, isMoving;
         private static string aPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
-        //private static int[,] mouse;
         private static string testFile = Path.Combine(aPath, "test.txt");
 
         private static Dictionary<Keys, KeyInfo> keysDB = new Dictionary<Keys, KeyInfo>();
         private static Dictionary<Keys, ToolTip> tooltipKey = new Dictionary<Keys, ToolTip>();
         private static PictureBox keyboard;
-        //private static Tuple<int, int, int> mouse = new Tuple<int, int, int>(0, 0, 0);
 
         public static ulong maxKeyPress;
-
-        /*private static Rectangle ScreenSize
-        {
-            get
-            {
-                return Screen.PrimaryScreen.WorkingArea;
-            }
-        }*/
-
-        //Hooks
-        public const uint SPI_GETMOUSESPEED = 0x0070;
-
-        public const int SRCCOPY = 0xcc0020;
-
-        [DllImport("User32.dll")]
-        private static extern Boolean SystemParametersInfo(
-            UInt32 uiAction,
-            UInt32 uiParam,
-            IntPtr pvParam,
-            UInt32 fWinIni);
-
-        [DllImport("user32", EntryPoint = "GetDC", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
-        private static extern int GetDC(IntPtr hwnd);
-
-        [DllImport("user32", EntryPoint = "ReleaseDC", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
-        private static extern int ReleaseDC(IntPtr hwnd, int hdc);
-
-        [DllImport("gdi32", EntryPoint = "BitBlt", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
-        private static extern int BitBlt(int hDestDC, int x, int y, int nWidth, int nHeight, int hSrcDC, int xSrc, int ySrc, int dwRop);
 
         public frmMain()
         {
@@ -91,15 +61,28 @@ namespace PCStats
             Console.WriteLine("({0}, {1})", ScreenSize.Width, ScreenSize.Height);
             mouse = new int[ScreenSize.Width, ScreenSize.Height];*/
 
+            DEVMODE vDevMode = new DEVMODE();
+            int i = 0;
+            while (EnumDisplaySettings(null, i, ref vDevMode))
+            {
+                Console.WriteLine("Width:{0} Height:{1} Color:{2} Frequency:{3}",
+                                        vDevMode.dmPelsWidth,
+                                        vDevMode.dmPelsHeight,
+                                        1 << vDevMode.dmBitsPerPel, vDevMode.dmDisplayFrequency
+                                    );
+                ++i;
+            }
+
             Timer1.Tick += Timer1_Tick;
             Timer1.Interval = interval;
             Timer1.Start();
 
-            using (Graphics g = CreateGraphics())
-                dpi = g.DpiX;
+            dpi = GetSystemDpi();
 
-            Console.WriteLine(dpi);
-            Console.WriteLine(GetMouseSpeed());
+            //Console.WriteLine("Screen phys size: " + new Point(SystemInformation.VirtualScreen.Width, SystemInformation.VirtualScreen.Height));
+            Console.WriteLine("Screen phys size: " + GetScreenPhysicalSize());
+            Console.WriteLine("DPI: " + dpi);
+            Console.WriteLine("Mouse Speed: " + GetMouseSpeed());
 
             KeysManager.GetPositions();
 
@@ -122,21 +105,30 @@ namespace PCStats
             //Nothing to do here yet
         }
 
-        private Bitmap GetMouseActivity(Rectangle r, Bitmap bo, int[,] mouse)
+        private Bitmap GetMouseActivity(Rectangle r, Bitmap bo, int screenID, int[,] mouse, bool writeTestFile = false)
         {
             StringBuilder sb = new StringBuilder();
             Bitmap b = new Bitmap(r.Width, r.Height);
+
             int maxNum = mouse.Cast<int>().Max(),
                 used = mouse.Cast<int>().Count(x => x > 0);
+
             MessageBox.Show(r.Width + " " + r.Height + "; Max Num = " + maxNum + string.Format("; % ({0} used of {1}) = " + (used / (double) (r.Width * r.Height)).ToString("F10") + "%", used, r.Width * r.Height));
+
             for (int i = 0; i < r.Width; ++i)
                 for (int j = 0; j < r.Height; ++j)
                 {
                     b.SetPixel(i, j, Interpolate(bo.GetPixel(i, j), Color.Red, Clamp(mouse[i, j] / (double) maxNum, 0, 1))); //new Color(255, 0, 0, mouse[i, j] * 255 / maxNum)
-                    sb.Append(string.Format("{0}x{1}: {2} ({3:F2})", i, j, mouse[i, j], mouse[i, j] / (double) maxNum) + Environment.NewLine);
+
+                    if (writeTestFile)
+                        sb.Append(string.Format("{0}x{1}: {2} ({3:F2})", i, j, mouse[i, j], mouse[i, j] / (double) maxNum) + Environment.NewLine);
                 }
-            File.WriteAllText(testFile, sb.ToString());
-            b.Save(Path.Combine(aPath, "map.png"));
+
+            if (writeTestFile)
+                File.WriteAllText(testFile, sb.ToString());
+
+            b.Save(Path.Combine(aPath, string.Format("map{0}.png", screenID)));
+
             return b;
         }
 
@@ -150,6 +142,7 @@ namespace PCStats
             double r = Lerp(color1.R, color2.R, fraction),
                    g = Lerp(color1.G, color2.G, fraction),
                    b = Lerp(color1.B, color2.B, fraction);
+
             return Color.FromArgb((int) Math.Round(r), (int) Math.Round(g), (int) Math.Round(b));
         }
 
@@ -158,7 +151,7 @@ namespace PCStats
             return value1 + (value2 - value1) * amount;
         }
 
-        private EventHandler MouseLoad(Rectangle workingArea, int[,] mouse)
+        private EventHandler MouseLoad(Rectangle workingArea, int id, int[,] mouse)
         {
             return (sender, e) =>
             {
@@ -182,7 +175,7 @@ namespace PCStats
                     ReleaseDC(default(IntPtr), DesktopDC);
                     BufferGraphics.ReleaseHdc(BufferGraphicsDC);
 
-                    newPic = GetMouseActivity(new Rectangle(0, 0, workingArea.Width, workingArea.Height), BufferBitmap, mouse);
+                    newPic = GetMouseActivity(new Rectangle(0, 0, workingArea.Width, workingArea.Height), BufferBitmap, id, mouse);
                 }
 
                 // Put the final result into the PictureBox_SplashImage which will cover the entire splash form
@@ -204,10 +197,10 @@ namespace PCStats
         private void ShowMouseActivity()
         {
             ScreenManager.showingForm = true;
-            foreach (KeyValuePair<int, int[,]> screens in ScreenManager.screenHits)
+            foreach (KeyValuePair<int, int[,]> screen in ScreenManager.screenHits)
             {
                 Form f = new Form();
-                f.Load += MouseLoad(ScreenManager.GetScreenArea(screens.Key), screens.Value);
+                f.Load += MouseLoad(ScreenManager.GetScreenArea(screen.Key), screen.Key, screen.Value);
                 f.BackColor = Color.White;
                 f.TransparencyKey = Color.Transparent;
                 f.FormBorderStyle = FormBorderStyle.None;
@@ -342,15 +335,20 @@ namespace PCStats
         private void Timer1_Tick(object sender, EventArgs e)
         {
             ++total;
+
             Point c = mousePos;
             double xyDist = Math.Sqrt(Math.Pow(lastPos.X - c.X, 2) + Math.Pow(lastPos.Y - c.Y, 2));
+
             lastPos = c;
             totalDist += xyDist;
             label1.Text = string.Format("Moving at: {0:F2}; Distance: {1:F2} pixels", xyDist, totalDist); //"Moving at: " + xyDist + "; Distance = " + totalDist + " pixels";
+
             double avgDist = totalDist / total,
                    cm = totalDist / dpi * 2.54d;
+
             label2.Text = string.Format("Average move: {0:F2}; Seconds: {1:F4} s", avgDist, total / (1000d / interval)); //"Average move: " + avgDist.ToString("F2");
             label3.Text = string.Format("Distance (cm): {0:F2} cm; (m): {1:F2} m", cm, cm / 100d);
+
             if (xyDist > 100)
             {
                 ++overticks;
@@ -361,6 +359,7 @@ namespace PCStats
                 if ((total - lastcTick) / (1000d / interval) > warnTime && overticks > 0)
                     overticks = 0;
             }
+
             if (overticks / (1000d / interval) > 1)
                 counting = false;
             else
@@ -368,8 +367,10 @@ namespace PCStats
                 if (!counting)
                     counting = true;
             }
+
             if (!counting)
                 ++cheatedTicks;
+
             label4.Text = (counting ? "Counting!" : "Not counting!") + " " + string.Format(" {0} cheated ticks!", cheatedTicks);
         }
 
@@ -408,17 +409,6 @@ namespace PCStats
         private static double GetDistance(Point p1, Point p2)
         {
             return Math.Sqrt(Math.Pow((p2.X - p1.X), 2) + Math.Pow((p2.Y - p1.Y), 2));
-        }
-
-        private static unsafe int GetMouseSpeed()
-        {
-            int speed;
-            SystemParametersInfo(
-                SPI_GETMOUSESPEED,
-                0,
-                new IntPtr(&speed),
-                0);
-            return speed;
         }
     }
 
@@ -541,6 +531,339 @@ namespace PCStats
         {
             return screens.SingleOrDefault(x => x.Value.Contains(mousePos));
         }
+    }
+
+    public class InteroperabilityAPI
+    {
+        #region "System DPI"
+
+        private enum DeviceCaps
+        {
+            /// <summary>
+            /// Device driver version
+            /// </summary>
+            DRIVERVERSION = 0,
+
+            /// <summary>
+            /// Device classification
+            /// </summary>
+            TECHNOLOGY = 2,
+
+            /// <summary>
+            /// Horizontal size in millimeters
+            /// </summary>
+            HORZSIZE = 4,
+
+            /// <summary>
+            /// Vertical size in millimeters
+            /// </summary>
+            VERTSIZE = 6,
+
+            /// <summary>
+            /// Horizontal width in pixels
+            /// </summary>
+            HORZRES = 8,
+
+            /// <summary>
+            /// Vertical height in pixels
+            /// </summary>
+            VERTRES = 10,
+
+            /// <summary>
+            /// Number of bits per pixel
+            /// </summary>
+            BITSPIXEL = 12,
+
+            /// <summary>
+            /// Number of planes
+            /// </summary>
+            PLANES = 14,
+
+            /// <summary>
+            /// Number of brushes the device has
+            /// </summary>
+            NUMBRUSHES = 16,
+
+            /// <summary>
+            /// Number of pens the device has
+            /// </summary>
+            NUMPENS = 18,
+
+            /// <summary>
+            /// Number of markers the device has
+            /// </summary>
+            NUMMARKERS = 20,
+
+            /// <summary>
+            /// Number of fonts the device has
+            /// </summary>
+            NUMFONTS = 22,
+
+            /// <summary>
+            /// Number of colors the device supports
+            /// </summary>
+            NUMCOLORS = 24,
+
+            /// <summary>
+            /// Size required for device descriptor
+            /// </summary>
+            PDEVICESIZE = 26,
+
+            /// <summary>
+            /// Curve capabilities
+            /// </summary>
+            CURVECAPS = 28,
+
+            /// <summary>
+            /// Line capabilities
+            /// </summary>
+            LINECAPS = 30,
+
+            /// <summary>
+            /// Polygonal capabilities
+            /// </summary>
+            POLYGONALCAPS = 32,
+
+            /// <summary>
+            /// Text capabilities
+            /// </summary>
+            TEXTCAPS = 34,
+
+            /// <summary>
+            /// Clipping capabilities
+            /// </summary>
+            CLIPCAPS = 36,
+
+            /// <summary>
+            /// Bitblt capabilities
+            /// </summary>
+            RASTERCAPS = 38,
+
+            /// <summary>
+            /// Length of the X leg
+            /// </summary>
+            ASPECTX = 40,
+
+            /// <summary>
+            /// Length of the Y leg
+            /// </summary>
+            ASPECTY = 42,
+
+            /// <summary>
+            /// Length of the hypotenuse
+            /// </summary>
+            ASPECTXY = 44,
+
+            /// <summary>
+            /// Shading and Blending caps
+            /// </summary>
+            SHADEBLENDCAPS = 45,
+
+            /// <summary>
+            /// Logical pixels inch in X
+            /// </summary>
+            LOGPIXELSX = 88,
+
+            /// <summary>
+            /// Logical pixels inch in Y
+            /// </summary>
+            LOGPIXELSY = 90,
+
+            /// <summary>
+            /// Number of entries in physical palette
+            /// </summary>
+            SIZEPALETTE = 104,
+
+            /// <summary>
+            /// Number of reserved entries in palette
+            /// </summary>
+            NUMRESERVED = 106,
+
+            /// <summary>
+            /// Actual color resolution
+            /// </summary>
+            COLORRES = 108,
+
+            // Printing related DeviceCaps. These replace the appropriate Escapes
+            /// <summary>
+            /// Physical Width in device units
+            /// </summary>
+            PHYSICALWIDTH = 110,
+
+            /// <summary>
+            /// Physical Height in device units
+            /// </summary>
+            PHYSICALHEIGHT = 111,
+
+            /// <summary>
+            /// Physical Printable Area x margin
+            /// </summary>
+            PHYSICALOFFSETX = 112,
+
+            /// <summary>
+            /// Physical Printable Area y margin
+            /// </summary>
+            PHYSICALOFFSETY = 113,
+
+            /// <summary>
+            /// Scaling factor x
+            /// </summary>
+            SCALINGFACTORX = 114,
+
+            /// <summary>
+            /// Scaling factor y
+            /// </summary>
+            SCALINGFACTORY = 115,
+
+            /// <summary>
+            /// Current vertical refresh rate of the display device (for displays only) in Hz
+            /// </summary>
+            VREFRESH = 116,
+
+            /// <summary>
+            /// Vertical height of entire desktop in pixels
+            /// </summary>
+            DESKTOPVERTRES = 117,
+
+            /// <summary>
+            /// Horizontal width of entire desktop in pixels
+            /// </summary>
+            DESKTOPHORZRES = 118,
+
+            /// <summary>
+            /// Preferred blt alignment
+            /// </summary>
+            BLTALIGNMENT = 119
+        }
+
+        /// <summary>
+        /// Retrieves device-specific information for the specified device.
+        /// </summary>
+        /// <param name="hdc">A handle to the DC.</param>
+        /// <param name="nIndex">The item to be returned.</param>
+        [DllImport("gdi32.dll")]
+        private static extern int GetDeviceCaps(IntPtr hdc, DeviceCaps nIndex);
+
+        public static int GetSystemDpi()
+        {
+            using (Graphics screen = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                IntPtr hdc = screen.GetHdc();
+
+                int virtualWidth = GetDeviceCaps(hdc, DeviceCaps.HORZRES);
+                int physicalWidth = GetDeviceCaps(hdc, DeviceCaps.DESKTOPHORZRES);
+                screen.ReleaseHdc(hdc);
+
+                return (int) (96f * physicalWidth / virtualWidth);
+            }
+        }
+
+        public static Point GetScreenPhysicalSize()
+        {
+            using (Graphics screen = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                IntPtr hdc = screen.GetHdc();
+
+                int physWidth = GetDeviceCaps(hdc, DeviceCaps.HORZSIZE),
+                    physHeight = GetDeviceCaps(hdc, DeviceCaps.VERTSIZE);
+                screen.ReleaseHdc(hdc);
+
+                return new Point(physWidth, physHeight);
+            }
+        }
+
+        #endregion "System DPI"
+
+        #region "Monitor Refresh Rate"
+
+        [DllImport("user32.dll")]
+        public static extern bool EnumDisplaySettings(
+      string deviceName, int modeNum, ref DEVMODE devMode);
+
+        private const int ENUM_CURRENT_SETTINGS = -1;
+
+        private const int ENUM_REGISTRY_SETTINGS = -2;
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct DEVMODE
+        {
+            private const int CCHDEVICENAME = 0x20;
+            private const int CCHFORMNAME = 0x20;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
+            public string dmDeviceName;
+
+            public short dmSpecVersion;
+            public short dmDriverVersion;
+            public short dmSize;
+            public short dmDriverExtra;
+            public int dmFields;
+            public int dmPositionX;
+            public int dmPositionY;
+            public ScreenOrientation dmDisplayOrientation;
+            public int dmDisplayFixedOutput;
+            public short dmColor;
+            public short dmDuplex;
+            public short dmYResolution;
+            public short dmTTOption;
+            public short dmCollate;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
+            public string dmFormName;
+
+            public short dmLogPixels;
+            public int dmBitsPerPel;
+            public int dmPelsWidth;
+            public int dmPelsHeight;
+            public int dmDisplayFlags;
+            public int dmDisplayFrequency;
+            public int dmICMMethod;
+            public int dmICMIntent;
+            public int dmMediaType;
+            public int dmDitherType;
+            public int dmReserved1;
+            public int dmReserved2;
+            public int dmPanningWidth;
+            public int dmPanningHeight;
+        }
+
+        #endregion "Monitor Refresh Rate"
+
+        #region "Mouse & Keyboard Hooks / Screenshots"
+
+        //Hooks
+        public const uint SPI_GETMOUSESPEED = 0x0070;
+
+        public const int SRCCOPY = 0xcc0020;
+
+        [DllImport("User32.dll")]
+        public static extern Boolean SystemParametersInfo(
+            UInt32 uiAction,
+            UInt32 uiParam,
+            IntPtr pvParam,
+            UInt32 fWinIni);
+
+        public static unsafe int GetMouseSpeed()
+        {
+            int speed;
+            SystemParametersInfo(
+                SPI_GETMOUSESPEED,
+                0,
+                new IntPtr(&speed),
+                0);
+            return speed;
+        }
+
+        [DllImport("user32", EntryPoint = "GetDC", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
+        public static extern int GetDC(IntPtr hwnd);
+
+        [DllImport("user32", EntryPoint = "ReleaseDC", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
+        public static extern int ReleaseDC(IntPtr hwnd, int hdc);
+
+        [DllImport("gdi32", EntryPoint = "BitBlt", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
+        public static extern int BitBlt(int hDestDC, int x, int y, int nWidth, int nHeight, int hSrcDC, int xSrc, int ySrc, int dwRop);
+
+        #endregion "Mouse & Keyboard Hooks / Screenshots"
     }
 
     public class StatsData

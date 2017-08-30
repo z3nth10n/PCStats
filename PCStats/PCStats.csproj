@@ -78,13 +78,8 @@
     <StartupObject>PCStats.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HtmlAgilityPack, Version=1.5.1.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.5.1\lib\Net45\HtmlAgilityPack.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="LiteLerped-WF-API">
+      <HintPath>..\..\..\..\LERP2DEV\Lerp2Dev Visual Studio\LiteLerped-WF-API\LiteLerped-WF-API\bin\Release\LiteLerped-WF-API.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -103,23 +98,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API.cs" />
-    <Compile Include="Lang\Credentials.en.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Credentials.en.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Lang\Credentials.es.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Credentials.es.resx</DependentUpon>
-    </Compile>
-    <Compile Include="frmCredentials.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmCredentials.Designer.cs">
-      <DependentUpon>frmCredentials.cs</DependentUpon>
-    </Compile>
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -175,24 +153,7 @@
       <DependentUpon>AppSetts.settings</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
-    <Compile Include="ProgramCreds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Resources\Credentials.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Credentials.resx</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="Lang\Credentials.en.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Credentials.en.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Lang\Credentials.es.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Credentials.es.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmCredentials.resx">
-      <DependentUpon>frmCredentials.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -206,10 +167,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="Resources\Credentials.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Credentials.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <None Include="MouseKeyHook\MouseKeyHook.nuspec" />
     <None Include="AppSetts.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -234,9 +191,10 @@
   <ItemGroup>
     <Content Include="MouseKeyHook\HotKeys\ReadMe.txt" />
     <Content Include="MouseKeyHook\MouseKeyHook.csproj" />
-    <None Include="Resources\refresh-20.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Lang\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
