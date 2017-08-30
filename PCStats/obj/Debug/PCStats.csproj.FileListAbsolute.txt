@@ -28,3 +28,25 @@ C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\ob
 C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\Debug\PCStats.Properties.Resources.resources
 C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\Debug\PCStats.csproj.GenerateResource.Cache
 C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\Debug\PCStats.PCStats.resources
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\HtmlAgilityPack.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\Newtonsoft.Json.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\HtmlAgilityPack.pdb
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\HtmlAgilityPack.xml
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\Newtonsoft.Json.xml
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.frmCredentials.resources
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.frmMain.resources
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.Properties.Resources.resources
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.Resources.Credentials.resources
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.Lang.Credentials.en.resources
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.Lang.Credentials.es.resources
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.csproj.GenerateResource.Cache
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\en\PCStats.resources.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\es\PCStats.resources.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.exe
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.pdb
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.exe.config
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.exe
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.pdb
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\en\PCStats.resources.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\es\PCStats.resources.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.csprojResolveAssemblyReference.cache

@@ -74,9 +74,24 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>PCStats.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlAgilityPack, Version=1.5.1.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.5.1\lib\Net45\HtmlAgilityPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -88,11 +103,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PCStats.cs">
+    <Compile Include="API.cs" />
+    <Compile Include="Lang\Credentials.en.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Credentials.en.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Lang\Credentials.es.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Credentials.es.resx</DependentUpon>
+    </Compile>
+    <Compile Include="frmCredentials.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PCStats.Designer.cs">
-      <DependentUpon>PCStats.cs</DependentUpon>
+    <Compile Include="frmCredentials.Designer.cs">
+      <DependentUpon>frmCredentials.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
     <Compile Include="KeysManager.cs" />
     <Compile Include="MouseKeyHook\Hook.cs" />
@@ -137,10 +169,32 @@
     <Compile Include="MouseKeyHook\WinApi\MouseStruct.cs" />
     <Compile Include="MouseKeyHook\WinApi\Point.cs" />
     <Compile Include="MouseKeyHook\WinApi\ThreadNativeMethods.cs" />
+    <Compile Include="AppSetts.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>AppSetts.settings</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="ProgramCreds.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="PCStats.resx">
-      <DependentUpon>PCStats.cs</DependentUpon>
+    <Compile Include="Resources\Credentials.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Credentials.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Lang\Credentials.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Credentials.en.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Lang\Credentials.es.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Credentials.es.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCredentials.resx">
+      <DependentUpon>frmCredentials.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMain.resx">
+      <DependentUpon>frmMain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -152,7 +206,16 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Resources\Credentials.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Credentials.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <None Include="MouseKeyHook\MouseKeyHook.nuspec" />
+    <None Include="AppSetts.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>AppSetts.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -164,12 +227,16 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="MouseKeyHook\HotKeys\ReadMe.txt" />
     <Content Include="MouseKeyHook\MouseKeyHook.csproj" />
+    <None Include="Resources\refresh-20.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
