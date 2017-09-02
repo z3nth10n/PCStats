@@ -28,14 +28,20 @@ C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\ob
 C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\Debug\PCStats.Properties.Resources.resources
 C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\Debug\PCStats.csproj.GenerateResource.Cache
 C:\Users\alvar\OneDrive\Documents\Visual Studio 2015\Projects\PCStats\PCStats\obj\Debug\PCStats.PCStats.resources
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.exe.config
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.exe
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.pdb
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\Lerp2Web.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\LiteLerped-WF-API.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\Lerp2Web.pdb
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\LiteLerped-WF-API.pdb
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\de\LiteLerped-WF-API.resources.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\en\LiteLerped-WF-API.resources.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\es\LiteLerped-WF-API.resources.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\fr\LiteLerped-WF-API.resources.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.csprojResolveAssemblyReference.cache
 D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.frmMain.resources
 D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.Properties.Resources.resources
 D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.csproj.GenerateResource.Cache
 D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.exe
 D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.pdb
-D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.exe.config
-D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.exe
-D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.pdb
-D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.csprojResolveAssemblyReference.cache
-D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\LiteLerped-WF-API.dll
-D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\LiteLerped-WF-API.pdb

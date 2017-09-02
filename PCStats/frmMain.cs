@@ -10,10 +10,11 @@ using System.Windows.Forms;
 using System.Reflection;
 using System.IO;
 using static PCStats.InteroperabilityAPI;
+using LiteLerped_WF_API.Controls;
 
 namespace PCStats
 {
-    public partial class frmMain : Form
+    public partial class frmMain : LocalizedForm
     {
         private static IKeyboardMouseEvents m_GlobalHook;
         private static long keyPressed, total, overticks, cheatedTicks, lastcTick;

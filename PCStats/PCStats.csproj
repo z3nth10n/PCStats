@@ -78,8 +78,12 @@
     <StartupObject>PCStats.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LiteLerped-WF-API">
-      <HintPath>..\..\..\..\LERP2DEV\Lerp2Dev Visual Studio\LiteLerped-WF-API\LiteLerped-WF-API\bin\Release\LiteLerped-WF-API.dll</HintPath>
+    <Reference Include="Lerp2Web">
+      <HintPath>..\..\..\..\LERP2DEV\Lerp2Dev Visual Studio\LiteLerped-WF-API\LiteLerped-WF-API\bin\Release\Lerp2Web.dll</HintPath>
+    </Reference>
+    <Reference Include="LiteLerped-WF-API, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\LERP2DEV\Lerp2Dev Visual Studio\LiteLerped-WF-API\LiteLerped-WF-API\bin\Debug\LiteLerped-WF-API.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -147,11 +151,6 @@
     <Compile Include="MouseKeyHook\WinApi\MouseStruct.cs" />
     <Compile Include="MouseKeyHook\WinApi\Point.cs" />
     <Compile Include="MouseKeyHook\WinApi\ThreadNativeMethods.cs" />
-    <Compile Include="AppSetts.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>AppSetts.settings</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmMain.resx">
@@ -168,10 +167,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="MouseKeyHook\MouseKeyHook.nuspec" />
-    <None Include="AppSetts.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>AppSetts.Designer.cs</LastGenOutput>
-    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

@@ -1,9 +1,0 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PCStats" GeneratedClassName="AppSetts">
-  <Profiles />
-  <Settings>
-    <Setting Name="DefaultLanguage" Type="System.String" Scope="User">
-      <Value Profile="(Default)">EN</Value>
-    </Setting>
-  </Settings>
-</SettingsFile>
