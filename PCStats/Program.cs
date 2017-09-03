@@ -1,32 +1,6 @@
-﻿using HtmlAgilityPack;
-using Lerp2Web;
-using LiteLerped_WF_API;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Lerp2Web;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Configuration;
-using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Management;
-using System.Media;
-using System.Net;
-using System.Reflection;
-using System.Resources;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
-using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using LiteProgram = LiteLerped_WF_API.Program;
 
 /*
@@ -50,7 +24,7 @@ namespace PCStats
 {
     public static class Program
     {
-        internal static frmMain main;
+        //internal static frmMain main;
 
         /// <summary>
         /// Punto de entrada principal para la aplicación.
@@ -64,13 +38,10 @@ namespace PCStats
             Application.SetCompatibleTextRenderingDefault(false);
 
             //Esta parte va para program creds
-            LiteProgram.cred = new frmCredentials();
+            //LiteProgram.cred = new frmCredentials();
             //---------------------------------
-            main = new frmMain();
-            Run();
+            Run(new frmMain());
             //---
-
-            Application.Run(LiteProgram.cred);
         }
 
         private static void Application_ApplicationExit(object sender, EventArgs e)
@@ -78,30 +49,14 @@ namespace PCStats
             Close();
         }
 
-        public static void Run()
+        private static void Run(frmMain main)
         {
             Console.WriteLine("Running program!");
 
-            frmCredentials.SetLoginCallback(main);
+            //Run LiteLerped-WF-API
+            LiteProgram.Run("pcstats_", main);
 
-            //Do config stuff...
-            API.LoadConfigCallback(() =>
-            {
-                Console.WriteLine("Config callback!!");
-                if (!API.config.AppSettings.Settings.IsEmpty(API.usernameConfig))
-                    LiteProgram.cred.a_txtUsername.Text = API.config.AppSettings.Settings[API.usernameConfig].Value;
-
-                if (!API.config.AppSettings.Settings.IsEmpty(API.passwordConfig))
-                    LiteProgram.cred.a_txtPassword.Text = API.config.AppSettings.Settings[API.passwordConfig].Value;
-
-                LiteProgram.cred.doingAutologin = !API.config.AppSettings.Settings.IsEmpty(API.usernameConfig) && !API.config.AppSettings.Settings.IsEmpty(API.passwordConfig);
-                LiteProgram.cred.a_chkRemember.Checked = API.RememberingAuth;
-            });
-            API.LoadConfig();
-
-            //And later, do things that will require it...
-            LiteProgram.web = new Lerp2Web.Lerp2Web("pcstats_");
-            LiteProgram.web.sessionSha = LiteProgram.web.StartSession();
+            Application.Run(main);
         }
 
         public static void Close()

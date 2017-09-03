@@ -78,8 +78,9 @@
     <StartupObject>PCStats.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lerp2Web">
-      <HintPath>..\..\..\..\LERP2DEV\Lerp2Dev Visual Studio\LiteLerped-WF-API\LiteLerped-WF-API\bin\Release\Lerp2Web.dll</HintPath>
+    <Reference Include="Lerp2Web, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\LERP2DEV\Lerp2Dev Visual Studio\Lerp2Web\Lerp2Web\bin\Release\Lerp2Web.dll</HintPath>
     </Reference>
     <Reference Include="LiteLerped-WF-API, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -186,6 +187,7 @@
   <ItemGroup>
     <Content Include="MouseKeyHook\HotKeys\ReadMe.txt" />
     <Content Include="MouseKeyHook\MouseKeyHook.csproj" />
+    <Content Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Lang\" />

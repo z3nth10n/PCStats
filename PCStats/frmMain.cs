@@ -14,7 +14,7 @@ using LiteLerped_WF_API.Controls;
 
 namespace PCStats
 {
-    public partial class frmMain : LocalizedForm
+    public partial class frmMain : LerpedForm
     {
         private static IKeyboardMouseEvents m_GlobalHook;
         private static long keyPressed, total, overticks, cheatedTicks, lastcTick;
@@ -64,7 +64,7 @@ namespace PCStats
 
             DEVMODE vDevMode = new DEVMODE();
             int i = 0;
-            while (EnumDisplaySettings(null, i, ref vDevMode))
+            /*while (EnumDisplaySettings(null, i, ref vDevMode))
             {
                 Console.WriteLine("Width:{0} Height:{1} Color:{2} Frequency:{3}",
                                         vDevMode.dmPelsWidth,
@@ -72,7 +72,7 @@ namespace PCStats
                                         1 << vDevMode.dmBitsPerPel, vDevMode.dmDisplayFrequency
                                     );
                 ++i;
-            }
+            }*/
 
             Timer1.Tick += Timer1_Tick;
             Timer1.Interval = interval;

@@ -1,0 +1,4 @@
+﻿Hacer lo de la frecuencia del ordenador
+Ver como exactamente se puede calcular la distancia viajada con el mouse a través del EDID (la pregunta de stackoverflow)
+
+Ver como guardar los datos en la clase que cree (Stats no se qué)
