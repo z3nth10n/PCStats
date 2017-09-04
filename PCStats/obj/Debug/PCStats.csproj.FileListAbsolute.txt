@@ -45,3 +45,6 @@ D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.Proper
 D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.csproj.GenerateResource.Cache
 D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.exe
 D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.pdb
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.frmMain.en.resources
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\en\PCStats.resources.dll
+D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\en\PCStats.resources.dll

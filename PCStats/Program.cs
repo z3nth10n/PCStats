@@ -32,6 +32,8 @@ namespace PCStats
         [STAThread]
         private static void Main()
         {
+            Console.WriteLine("Running program!");
+
             Application.ApplicationExit += Application_ApplicationExit;
 
             Application.EnableVisualStyles();
@@ -40,23 +42,12 @@ namespace PCStats
             //Esta parte va para program creds
             //LiteProgram.cred = new frmCredentials();
             //---------------------------------
-            Run(new frmMain());
-            //---
+            LiteProgram.Run("pcstats_", new frmMain(), null);
         }
 
         private static void Application_ApplicationExit(object sender, EventArgs e)
         {
             Close();
-        }
-
-        private static void Run(frmMain main)
-        {
-            Console.WriteLine("Running program!");
-
-            //Run LiteLerped-WF-API
-            LiteProgram.Run("pcstats_", main);
-
-            Application.Run(main);
         }
 
         public static void Close()
