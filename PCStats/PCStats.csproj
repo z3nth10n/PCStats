@@ -189,6 +189,7 @@
   <ItemGroup>
     <Content Include="MouseKeyHook\HotKeys\ReadMe.txt" />
     <Content Include="MouseKeyHook\MouseKeyHook.csproj" />
+    <None Include="Resources\keyboard.png" />
     <Content Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>

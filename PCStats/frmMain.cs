@@ -228,7 +228,7 @@ namespace PCStats
 
             keyboard = new PictureBox();
 
-            keyboard.Image = Image.FromFile(Path.Combine(aPath, "keyboard.png"));
+            keyboard.Image = Properties.Resources.keyboard; //Image.FromFile(Path.Combine(aPath, "keyboard.png"));
             keyboard.Size = new Size(950, 268);
             keyboard.Location = new Point(0, 0);
 
