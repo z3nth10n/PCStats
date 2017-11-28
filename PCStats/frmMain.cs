@@ -811,25 +811,25 @@ namespace PCStats
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
             public string dmDeviceName;
 
-            public short dmSpecVersion;
-            public short dmDriverVersion;
-            public short dmSize;
-            public short dmDriverExtra;
+            public sbyte dmSpecVersion;
+            public sbyte dmDriverVersion;
+            public sbyte dmSize;
+            public sbyte dmDriverExtra;
             public int dmFields;
             public int dmPositionX;
             public int dmPositionY;
             public ScreenOrientation dmDisplayOrientation;
             public int dmDisplayFixedOutput;
-            public short dmColor;
-            public short dmDuplex;
-            public short dmYResolution;
-            public short dmTTOption;
-            public short dmCollate;
+            public sbyte dmColor;
+            public sbyte dmDuplex;
+            public sbyte dmYResolution;
+            public sbyte dmTTOption;
+            public sbyte dmCollate;
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
             public string dmFormName;
 
-            public short dmLogPixels;
+            public sbyte dmLogPixels;
             public int dmBitsPerPel;
             public int dmPelsWidth;
             public int dmPelsHeight;
@@ -957,7 +957,7 @@ namespace PCStats
 
         public uint wattsUsed;
 
-        public short minTemp,
+        public sbyte minTemp,
                      maxTemp,
                      coreMultiplier;
 
@@ -988,7 +988,7 @@ namespace PCStats
 
         public uint wattsUsed;
 
-        public short tempMax,
+        public sbyte tempMax,
                      tempMin; //Cycles, estaria interesante calcularlo
 
         public ulong initCycles,
