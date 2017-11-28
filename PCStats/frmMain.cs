@@ -11,6 +11,7 @@ using System.Reflection;
 using System.IO;
 using static PCStats.InteroperabilityAPI;
 using LiteLerped_WF_API.Controls;
+using LiteLerped_WF_API.Classes;
 
 namespace PCStats
 {
@@ -41,6 +42,9 @@ namespace PCStats
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            if (StartupManager.IsUserAdministrator() && StartupManager.ExistsStartupKey(Program.appName) == null)
+                StartupManager.AddApplicationToStartup(Program.appName);
+
             m_GlobalHook = Hook.GlobalEvents();
 
             m_GlobalHook.MouseMoveExt += ExtMouseMoved;

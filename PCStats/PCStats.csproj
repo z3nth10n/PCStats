@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PCStats</RootNamespace>
     <AssemblyName>PCStats</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -82,8 +82,9 @@
     <StartupObject>PCStats.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LiteLerped-WF-API">
-      <HintPath>..\..\..\..\LERP2DEV\Lerp2Dev Visual Studio\LiteLerped-WF-API\LiteLerped-WF-API\bin\Release\LiteLerped-WF-API.dll</HintPath>
+    <Reference Include="LiteLerped-WF-API, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\LiteLerped-WF-API\LiteLerped-WF-API\bin\Release\LiteLerped-WF-API.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />

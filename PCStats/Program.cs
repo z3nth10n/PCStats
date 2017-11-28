@@ -24,6 +24,8 @@ namespace PCStats
 {
     public static class Program
     {
+        public const string appName = "PCStats";
+
         //internal static frmMain main;
 
         /// <summary>
@@ -42,7 +44,7 @@ namespace PCStats
             //Esta parte va para program creds
             //LiteProgram.cred = new frmCredentials();
             //---------------------------------
-            LiteProgram.Run("pcstats_", new frmMain(), null);
+            LiteProgram.Run(string.Format("{0}_", appName.ToLower()), new frmMain(), null);
         }
 
         private static void Application_ApplicationExit(object sender, EventArgs e)

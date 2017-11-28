@@ -37,7 +37,6 @@
             this.herramientasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menu1 = new System.Windows.Forms.ToolStripMenuItem();
             this.menu2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.label5 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -88,16 +87,10 @@
             this.menu2.Name = "menu2";
             this.menu2.Click += new System.EventHandler(this.menu2_Click);
             // 
-            // label5
-            // 
-            resources.ApplyResources(this.label5, "label5");
-            this.label5.Name = "label5";
-            // 
             // frmMain
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -125,7 +118,6 @@
         private System.Windows.Forms.ToolStripMenuItem herramientasToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem menu1;
         private System.Windows.Forms.ToolStripMenuItem menu2;
-        private System.Windows.Forms.Label label5;
     }
 }
 

@@ -48,3 +48,23 @@ D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.pdb
 D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.frmMain.en.resources
 D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\bin\Debug\en\PCStats.resources.dll
 D:\VISUAL STUDIO\Visual Studio Projects\PCStats\PCStats\obj\Debug\en\PCStats.resources.dll
+X:\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.csprojResolveAssemblyReference.cache
+X:\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.frmMain.resources
+X:\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.Properties.Resources.resources
+X:\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.frmMain.en.resources
+X:\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.csproj.GenerateResource.Cache
+X:\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.csproj.CoreCompileInputs.cache
+X:\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.exe
+X:\Visual Studio Projects\PCStats\PCStats\obj\Debug\PCStats.pdb
+X:\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.exe.config
+X:\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.exe
+X:\Visual Studio Projects\PCStats\PCStats\bin\Debug\PCStats.pdb
+X:\Visual Studio Projects\PCStats\PCStats\bin\Debug\en\PCStats.resources.dll
+X:\Visual Studio Projects\PCStats\PCStats\bin\Debug\LiteLerped-WF-API.dll
+X:\Visual Studio Projects\PCStats\PCStats\bin\Debug\LiteLerped-WF-API.pdb
+X:\Visual Studio Projects\PCStats\PCStats\bin\Debug\LiteLerped-WF-API.dll.config
+X:\Visual Studio Projects\PCStats\PCStats\bin\Debug\de\LiteLerped-WF-API.resources.dll
+X:\Visual Studio Projects\PCStats\PCStats\bin\Debug\en\LiteLerped-WF-API.resources.dll
+X:\Visual Studio Projects\PCStats\PCStats\bin\Debug\es\LiteLerped-WF-API.resources.dll
+X:\Visual Studio Projects\PCStats\PCStats\bin\Debug\fr\LiteLerped-WF-API.resources.dll
+X:\Visual Studio Projects\PCStats\PCStats\obj\Debug\en\PCStats.resources.dll
