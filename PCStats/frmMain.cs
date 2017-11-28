@@ -17,8 +17,10 @@ namespace PCStats
 {
     public partial class frmMain : LerpedForm
     {
+        //Todo esto me lo tengo q cargar
         private static IKeyboardMouseEvents m_GlobalHook;
-        private static long keyPressed, total, overticks, cheatedTicks, lastcTick;
+
+        /*private static long keyPressed, total, overticks, cheatedTicks, lastcTick;
         private static Point mousePos, lastPos, realLastPos;
         private const int interval = 20;
         private const double warnTime = .5f;
@@ -27,7 +29,7 @@ namespace PCStats
         private static bool counting, isMoving;
         private static string aPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
-        private static string testFile = Path.Combine(aPath, "test.txt");
+        private static string testFile = Path.Combine(aPath, "test.txt");*/
 
         private static Dictionary<Keys, KeyInfo> keysDB = new Dictionary<Keys, KeyInfo>();
         private static Dictionary<Keys, ToolTip> tooltipKey = new Dictionary<Keys, ToolTip>();
