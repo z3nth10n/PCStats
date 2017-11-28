@@ -42,8 +42,21 @@ namespace PCStats
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            if (StartupManager.IsUserAdministrator() && StartupManager.ExistsStartupKey(Program.appName) == null)
-                StartupManager.AddApplicationToStartup(Program.appName);
+            bool existsKey = StartupManager.ExistsStartupKey(Program.appName),
+                 isAdmin = StartupManager.IsUserAdministrator();
+
+            if (!StartupManager.CheckIfRunningUnderVsHost())
+            {
+                if (!existsKey)
+                {
+                    if (isAdmin)
+                        StartupManager.AddApplicationToStartup(Program.appName);
+                    else
+                        StartupManager.RunAsAdmin();
+                }
+            }
+            else
+                Console.WriteLine("Cannot run as an admin in vshost environment!");
 
             m_GlobalHook = Hook.GlobalEvents();
 
@@ -871,7 +884,160 @@ namespace PCStats
         #endregion "Mouse & Keyboard Hooks / Screenshots"
     }
 
+    //La id de cada registro no la vamos a añadir, que se encargue SQL
     public class StatsData
     {
+        public int userId, entityId; //No se si lo deberia poner aqui o deberia sacarlo de algun otro lado, la cuestón esq cuando envie los datos este parametro no puede faltar...
+
+        //O quizás deba pasar los datos del login para recheckear si todo es valido y q me devuelva el metodo q comprobaba esto (q recuerdo q lo hacia) si lo hace
+        public MouseData mouse;
+
+        public KeyboardData keyboard;
+        public ProcessData[] processes;
+    }
+
+    public class MouseData
+    {
+        public int mouseModelId;
+        public string mouseMac;
+
+        public uint wattsUsed;
+
+        public ulong pixelsTravel,
+                     leftClickDone,
+                     rightClickDone,
+                     initCycles,
+                     timeWorking;
+    }
+
+    public class KeyboardData
+    {
+        public int keyboardModelId;
+        public string keyboardMac;
+
+        public uint wattsUsed;
+
+        public ulong timesPressed, //Total keys pressed
+                     initCycles,
+                     timeWorking;
+
+        public KeyData[] keys;
+    }
+
+    public class KeyData
+    {
+        public int keyboardId,
+                   keyCode; //Binary code for key pressed
+
+        public ulong timeWorking;
+        public TimeSpan lastTimePressed;
+    }
+
+    public class StorageData
+    {
+        public int storageModelId;
+        public string storageMac;
+
+        public uint maxDeltaWrittenBytes,
+                    maxDeltaReadBytes,
+                    maxDeltaOtherBytes,
+                    wattsUsed;
+
+        public ulong writtenBytes,
+                     readBytes,
+                     otherBytes,
+                     initCycles,
+                     timeWorking;
+    }
+
+    public class CpuData
+    {
+        public int cpuModelId;
+        public string cpuMac;
+
+        public uint wattsUsed;
+
+        public short minTemp,
+                     maxTemp,
+                     coreMultiplier;
+
+        public ulong gigacyclesDone,
+                     initCycles,
+                     timeWorking;
+    }
+
+    public class NetworkData
+    { //De esto debemos hacer una array
+        public string networkMac,
+                      networkAdapterModelId;
+
+        public uint wattsUsed,
+                    maxDeltaUploadedBytes,
+                    minDeltaDownloadedBytes;
+
+        public ulong uploadedBytes,
+                     downloadBytes,
+                     initCycles,
+                     timeWorking;
+    }
+
+    public class GpuCoreData
+    {
+        public int gpuModelId;
+        public string gpuMac;
+
+        public uint wattsUsed;
+
+        public short tempMax,
+                     tempMin; //Cycles, estaria interesante calcularlo
+
+        public ulong initCycles,
+                     timeWorking;
+    }
+
+    public class GpuVRAMData
+    {
+        public int gpuId;
+
+        public uint gpuSystemMaxDeltaBytesTransfered,
+                    gpuDedicatedMaxDeltaBytesTransfered;
+
+        public ulong gpuSystemBytesTransfered,
+                     gpuDedicatedBytesTransfered;
+    }
+
+    public class RamStats
+    {
+        public int ramModelId;
+        public string ramMac;
+
+        public uint wattsUsed,
+                    maxDeltabytes;
+
+        public ulong bytesTransfered,
+                     initCycles,
+                     timeWorking;
+    }
+
+    public class ProcessData
+    {
+        public string processDesc;
+        public float avgCpuUsage;
+
+        public uint storageMaxDeltaReadBytes,
+                     storageMaxDeltaWrittenBytes,
+                     storageMaxDeltOtherBytes,
+                     networkMaxDeltaUploadedBytes,
+                     networkMaxDeltaDownloadedBytes;
+
+        public ulong ramBytesTransfered,
+                     ramMaxDeltaBytes,
+                     storageReadBytes,
+                     storageWrittenBytes,
+                     storageOtherBytes,
+
+                     networkUploadedBytes,
+                     networkDownloadedBytes,
+                     timeSpent;
     }
 }
