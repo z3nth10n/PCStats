@@ -20,22 +20,56 @@ namespace PCStats
         //Todo esto me lo tengo q cargar
         private static IKeyboardMouseEvents m_GlobalHook;
 
-        /*private static long keyPressed, total, overticks, cheatedTicks, lastcTick;
-        private static Point mousePos, lastPos, realLastPos;
-        private const int interval = 20;
-        private const double warnTime = .5f;
-        private static double totalDist, dpi;
-        private static Timer Timer1 = new Timer();
-        private static bool counting, isMoving;
-        private static string aPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        /*
 
-        private static string testFile = Path.Combine(aPath, "test.txt");*/
+        private static string aPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);*/
+
+        private static string appPath
+        {
+            get
+            {
+                return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            }
+        }
+
+        public static StatsData PCStats = new StatsData();
+
+        //Mouse
+
+        //Timer used in mouse measurement
+        private static Timer Timer1 = new Timer();
+
+        private const int timerInterval = 20;
+
+        private static bool counting, //Check if the mouse isn't being cheated
+                            isMoving; //Check if the mouse isn't AFK
+
+        private static ulong totalPixelsTraveled,
+                             //overticks, //This are the ticks where the mouse moves too quicky (more than 100 pixels every 20 ms, 5000 pixels/sec)
+                             //cheatedTicks, //Once we move more than 1 second overticking, we pass to the second phase that is make counting false and store there the pixels we are cheating
+                             lastcTick, //When was the last time we cheated the mouse movement
+                             //totalDist; //THIS IS THE REAL DISTANCE WE WILL STORE IN THE DB
+
+        private static Point mousePos, //Current mouse position inside Timer tick
+                             lastPos, //Last position catched by the Timer
+                             realLastPos; //Current mouse position inside Mouse Movement Event
+
+        private const double warnTime = .5; //Time where the mouse is cheated if we are moving it so quickly (half second by default)
+
+        //Keyboard
 
         private static Dictionary<Keys, KeyInfo> keysDB = new Dictionary<Keys, KeyInfo>();
         private static Dictionary<Keys, ToolTip> tooltipKey = new Dictionary<Keys, ToolTip>();
         private static PictureBox keyboard;
 
-        public static ulong maxKeyPress;
+        internal static ulong keyPressed,
+                              maxKeyPress; //Number of times a key was pressed as max
+
+        //Screen
+        private static double dpi;
+
+        //Debug purpouses
+        private static string testFile = Path.Combine(appPath, "test.txt");
 
         public frmMain()
         {
@@ -94,7 +128,7 @@ namespace PCStats
             }*/
 
             Timer1.Tick += Timer1_Tick;
-            Timer1.Interval = interval;
+            Timer1.Interval = timerInterval;
             Timer1.Start();
 
             dpi = GetSystemDpi();
@@ -111,7 +145,7 @@ namespace PCStats
 
         private void FormKey_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.DrawImage(Image.FromFile(Path.Combine(aPath, "keyboard.png")), new Rectangle(0, 0, 950, 268));
+            e.Graphics.DrawImage(Image.FromFile(Path.Combine(appPath, "keyboard.png")), new Rectangle(0, 0, 950, 268));
             foreach (KeyValuePair<Keys, KeyInfo> key in keysDB)
                 e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb((int) (key.Value.timesPressed / maxKeyPress * 240), Color.Red)), KeysManager.GetRectangle(key.Key));
         }
@@ -147,7 +181,7 @@ namespace PCStats
             if (writeTestFile)
                 File.WriteAllText(testFile, sb.ToString());
 
-            b.Save(Path.Combine(aPath, string.Format("map{0}.png", screenID)));
+            b.Save(Path.Combine(appPath, string.Format("map{0}.png", screenID)));
 
             return b;
         }
@@ -247,7 +281,7 @@ namespace PCStats
 
             keyboard = new PictureBox();
 
-            keyboard.Image = Properties.Resources.keyboard; //Image.FromFile(Path.Combine(aPath, "keyboard.png"));
+            keyboard.Image = Properties.Resources.keyboard; //Image.FromFile(Path.Combine(appPath, "keyboard.png"));
             keyboard.Size = new Size(950, 268);
             keyboard.Location = new Point(0, 0);
 
@@ -354,33 +388,33 @@ namespace PCStats
 
         private void Timer1_Tick(object sender, EventArgs e)
         {
-            ++total;
+            ++totalPixelsTraveled;
 
             Point c = mousePos;
             double xyDist = Math.Sqrt(Math.Pow(lastPos.X - c.X, 2) + Math.Pow(lastPos.Y - c.Y, 2));
 
             lastPos = c;
-            totalDist += xyDist;
-            label1.Text = string.Format("Moving at: {0:F2}; Distance: {1:F2} pixels", xyDist, totalDist); //"Moving at: " + xyDist + "; Distance = " + totalDist + " pixels";
+            PCStats.mouse.pixelsTravel += (ulong) Math.Round(xyDist);
+            label1.Text = string.Format("Moving at: {0:F2}; Distance: {1:F2} pixels", xyDist, PCStats.mouse.pixelsTravel); //"Moving at: " + xyDist + "; Distance = " + totalDist + " pixels";
 
-            double avgDist = totalDist / total,
-                   cm = totalDist / dpi * 2.54d;
+            double avgDist = PCStats.mouse.pixelsTravel / totalPixelsTraveled,
+                   cm = PCStats.mouse.pixelsTravel / dpi * 2.54d;
 
-            label2.Text = string.Format("Average move: {0:F2}; Seconds: {1:F4} s", avgDist, total / (1000d / interval)); //"Average move: " + avgDist.ToString("F2");
+            label2.Text = string.Format("Average move: {0:F2}; Seconds: {1:F4} s", avgDist, totalPixelsTraveled / (1000d / timerInterval)); //"Average move: " + avgDist.ToString("F2");
             label3.Text = string.Format("Distance (cm): {0:F2} cm; (m): {1:F2} m", cm, cm / 100d);
 
             if (xyDist > 100)
             {
-                ++overticks;
-                lastcTick = total;
+                ++PCStats.mouse.overTicks;
+                lastcTick = totalPixelsTraveled;
             }
             else
             {
-                if ((total - lastcTick) / (1000d / interval) > warnTime && overticks > 0)
-                    overticks = 0;
+                if ((totalPixelsTraveled - lastcTick) / (1000d / timerInterval) > warnTime && PCStats.mouse.overTicks > 0)
+                    PCStats.mouse.overTicks = 0;
             }
 
-            if (overticks / (1000d / interval) > 1)
+            if (PCStats.mouse.overTicks / (1000d / timerInterval) > warnTime)
                 counting = false;
             else
             {
@@ -389,7 +423,7 @@ namespace PCStats
             }
 
             if (!counting)
-                ++cheatedTicks;
+                ++PCStats.mouse.cheatedTicks;
 
             label4.Text = (counting ? "Counting!" : "Not counting!") + " " + string.Format(" {0} cheated ticks!", cheatedTicks);
         }
@@ -412,7 +446,7 @@ namespace PCStats
 
         public void ExtKeyPress(object sender, KeyEventArgs e)
         {
-            ++keyPressed;
+            ++PCStats.keyboard.timesPressed;
             if (!keysDB.ContainsKey(e.KeyCode))
                 keysDB.Add(e.KeyCode, new KeyInfo(e.KeyCode));
             ++keysDB[e.KeyCode].timesPressed;
@@ -432,7 +466,7 @@ namespace PCStats
         }
     }
 
-    public class KeyInfo
+    /*public class KeyInfo
     {
         public KeyInfo(Keys k)
         {
@@ -440,7 +474,10 @@ namespace PCStats
         }
 
         public Keys key = Keys.None;
-        public ulong timesPressed = 0, modifierKeys = 0;
+
+        public ulong timesPressed = 0,
+                     modifierKeys = 0;
+
         public List<DateTime> whenPressed = new List<DateTime>();
         public Dictionary<ModifierKey, ulong> modPressed = new Dictionary<ModifierKey, ulong>();
 
@@ -474,7 +511,7 @@ namespace PCStats
             string t = (DateTime.Now - whenPressed.Last()).ToString(@"d\d\ hh\h\ mm\m\ ss\s").TrimStart(' ', 'd', 'h', 'm', 's', '0');
             return string.Format("[Key '{0}']: {1} times pressed ({4:F2}%)\n{2} mod keys pressed within it.\nPressed {3} ago.", key.ToString(), timesPressed, modifierKeys, t, timesPressed * 1d / frmMain.maxKeyPress);
         }
-    }
+    }*/
 
     public class ModifierKey
     {
@@ -553,8 +590,35 @@ namespace PCStats
         }
     }
 
-    public class InteroperabilityAPI
+    public class InteroperabilityAPI : frmMain
     {
+        #region "Virtual key to numric value"
+
+        [DllImport("user32.dll")]
+        private static extern int MapVirtualKey(uint uCode, uint uMapType);
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            const int WM_KEYDOWN = 0x100;
+
+            if (msg.Msg == WM_KEYDOWN)
+            {
+                // 2 is used to translate into an unshifted character value
+                int nonVirtualKey = MapVirtualKey((uint) keyData, 2);
+
+                //char mappedChar = Convert.ToChar(nonVirtualKey);
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        public static int ConvertCharToInt32(string s)
+        {
+            return BitConverter.ToInt32(Encoding.UTF32.GetBytes(s), 0);
+        }
+
+        #endregion "Virtual key to numric value"
+
         #region "System DPI"
 
         private enum DeviceCaps
@@ -892,10 +956,17 @@ namespace PCStats
         public int userId, entityId; //No se si lo deberia poner aqui o deberia sacarlo de algun otro lado, la cuestón esq cuando envie los datos este parametro no puede faltar...
 
         //O quizás deba pasar los datos del login para recheckear si todo es valido y q me devuelva el metodo q comprobaba esto (q recuerdo q lo hacia) si lo hace
-        public MouseData mouse;
+        public MouseData mouse = new MouseData();
 
-        public KeyboardData keyboard;
-        public ProcessData[] processes;
+        public KeyboardData keyboard = new KeyboardData();
+        public List<ProcessData> processes = new List<ProcessData>(); //Number of active process on the constructor call
+
+        public StatsData()
+        {
+            //Get current processes
+        }
+
+        //Make a hook event for the process to add and delete active processes (instead of removing we only have to unmark and mark [bool]active as true)
     }
 
     public class MouseData
@@ -906,6 +977,8 @@ namespace PCStats
         public uint wattsUsed;
 
         public ulong pixelsTravel,
+                     overTicks,
+                     cheatedTicks,
                      leftClickDone,
                      rightClickDone,
                      initCycles,
@@ -923,16 +996,63 @@ namespace PCStats
                      initCycles,
                      timeWorking;
 
-        public KeyData[] keys;
+        public KeyData[] keys = new KeyData[]; // <=== length is the number of keys in keyboard
+
+        public KeyData this[int code]
+        {
+            get
+            {
+                return keys.SingleOrDefault(k => k.keyCode == code);
+            }
+        }
     }
 
+    //Tengo que comprobar las modifier keys, es decir, si se pulsa el Ctrl, Alt o Alt Gr al mismo tiempo y guardarlo... No se como...
     public class KeyData
-    {
-        public int keyboardId,
-                   keyCode; //Binary code for key pressed
+    { //This don't need keyboardId, because php will introduce it later
+        public int keyCode; //Binary code for key pressed
 
-        public ulong timeWorking;
+        public ulong timesPrssed, timeWorking, modifierKeysPressed;
         public TimeSpan lastTimePressed;
+
+        public KeyData(int k)
+        {
+            keyCode = k;
+        }
+
+        public ulong timesPressed = 0,
+                     modifierKeys = 0;
+
+        public ModifierKey GetMod(Keys k)
+        {
+            return modPressed.Keys.FirstOrDefault(x => x.key == k);
+        }
+
+        public void IncrMod(Keys k)
+        {
+            ulong v = modPressed.FirstOrDefault(x => x.Key.key == key).Value;
+            SetMod(k, ++v);
+        }
+
+        public void SetMod(Keys k, ulong value)
+        {
+            ModifierKey rmk = new ModifierKey(k);
+            foreach (ModifierKey mk in modPressed.Keys)
+                if (mk.key == k)
+                {
+                    rmk = mk;
+                    break;
+                }
+            rmk.whenPressed.Add(DateTime.Now);
+            modPressed.Remove(GetMod(k));
+            modPressed.Add(rmk, value);
+        }
+
+        public string GetToolTip()
+        { //Create method for the name of the keys
+            string t = (DateTime.Now - whenPressed.Last()).ToString(@"d\d\ hh\h\ mm\m\ ss\s").TrimStart(' ', 'd', 'h', 'm', 's', '0');
+            return string.Format("[Key '{0}']: {1} times pressed ({4:F2}%)\n{2} mod keys pressed within it.\nPressed {3} ago.", key.ToString(), timesPressed, modifierKeys, t, timesPressed * 1d / frmMain.maxKeyPress);
+        }
     }
 
     public class StorageData
@@ -1041,5 +1161,7 @@ namespace PCStats
                      networkUploadedBytes,
                      networkDownloadedBytes,
                      timeSpent;
+
+        public bool active;
     }
 }
