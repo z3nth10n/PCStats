@@ -9,7 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Reflection;
 using System.IO;
-using static PCStats.InteroperabilityAPI;
+using static PCStats.WinAPI;
 using LiteLerped_WF_API.Controls;
 using LiteLerped_WF_API.Classes;
 
@@ -47,8 +47,9 @@ namespace PCStats
         private static ulong totalPixelsTraveled,
                              //overticks, //This are the ticks where the mouse moves too quicky (more than 100 pixels every 20 ms, 5000 pixels/sec)
                              //cheatedTicks, //Once we move more than 1 second overticking, we pass to the second phase that is make counting false and store there the pixels we are cheating
-                             lastcTick, //When was the last time we cheated the mouse movement
-                             //totalDist; //THIS IS THE REAL DISTANCE WE WILL STORE IN THE DB
+                             lastcTick; //When was the last time we cheated the mouse movement
+
+        //totalDist; //THIS IS THE REAL DISTANCE WE WILL STORE IN THE DB
 
         private static Point mousePos, //Current mouse position inside Timer tick
                              lastPos, //Last position catched by the Timer
@@ -58,9 +59,10 @@ namespace PCStats
 
         //Keyboard
 
-        private static Dictionary<Keys, KeyInfo> keysDB = new Dictionary<Keys, KeyInfo>();
+        //private static Dictionary<Keys, KeyInfo> keysDB = new Dictionary<Keys, KeyInfo>();
         private static Dictionary<Keys, ToolTip> tooltipKey = new Dictionary<Keys, ToolTip>();
-        private static PictureBox keyboard;
+
+        private static PictureBox keyboardPic;
 
         internal static ulong keyPressed,
                               maxKeyPress; //Number of times a key was pressed as max
@@ -145,9 +147,9 @@ namespace PCStats
 
         private void FormKey_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.DrawImage(Image.FromFile(Path.Combine(appPath, "keyboard.png")), new Rectangle(0, 0, 950, 268));
-            foreach (KeyValuePair<Keys, KeyInfo> key in keysDB)
-                e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb((int) (key.Value.timesPressed / maxKeyPress * 240), Color.Red)), KeysManager.GetRectangle(key.Key));
+            e.Graphics.DrawImage(Image.FromFile(Path.Combine(appPath, "keyboardPic.png")), new Rectangle(0, 0, 950, 268));
+            foreach (var key in PCStats.keyboard.keys)
+                e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb((int) (key.timesPressed / maxKeyPress * 240), Color.Red)), KeysManager.GetRectangle(key.linkedKeys));
         }
 
         /*private void FormMouse_Load(object sender, EventArgs e)
@@ -279,15 +281,15 @@ namespace PCStats
 
             RefreshKeysNum();
 
-            keyboard = new PictureBox();
+            keyboardPic = new PictureBox();
 
-            keyboard.Image = Properties.Resources.keyboard; //Image.FromFile(Path.Combine(appPath, "keyboard.png"));
-            keyboard.Size = new Size(950, 268);
-            keyboard.Location = new Point(0, 0);
+            keyboardPic.Image = Properties.Resources.keyboard; //Image.FromFile(Path.Combine(appPath, "keyboardPic.png"));
+            keyboardPic.Size = new Size(950, 268);
+            keyboardPic.Location = new Point(0, 0);
 
-            keyboard.Paint += Keyboard_Paint;
+            keyboardPic.Paint += Keyboard_Paint;
 
-            f.Controls.Add(keyboard);
+            f.Controls.Add(keyboardPic);
 
             foreach (KeyValuePair<Keys, Rectangle> kp in KeysManager.keyPositions)
                 if (kp.Value != Rectangle.Empty)
@@ -302,29 +304,29 @@ namespace PCStats
                     pnl.MouseEnter += Panel_Enter;
                     pnl.MouseLeave += Panel_Leave;
 
-                    keyboard.Controls.Add(pnl);
+                    keyboardPic.Controls.Add(pnl);
                 }
 
             f.ShowDialog();
         }
 
-        private void RefreshKeysNum(bool repaint = false)
+        internal void RefreshKeysNum(bool repaint = false)
         {
-            if (keysDB.Count > 0)
-                maxKeyPress = keysDB.Select(x => x.Value.timesPressed).Max();
+            if (PCStats.keyboard.keys.Count > 0)
+                maxKeyPress = PCStats.keyboard.keys.Select(x => x.timesPressed).Max();
             if (maxKeyPress == 0)
                 ++maxKeyPress;
             if (repaint)
             {
                 try
                 {
-                    //keyboard.Invalidate();  // request a delayed Repaint by the normal MessageLoop system
-                    //keyboard.Update();      // forces Repaint of invalidated area
-                    keyboard.Refresh();     // Combines Invalidate() and Update()
+                    //keyboardPic.Invalidate();  // request a delayed Repaint by the normal MessageLoop system
+                    //keyboardPic.Update();      // forces Repaint of invalidated area
+                    keyboardPic.Refresh();     // Combines Invalidate() and Update()
                 }
                 catch
                 {
-                    Console.WriteLine("Something unexpected ocurred with the keyboard!");
+                    Console.WriteLine("Something unexpected ocurred with the keyboardPic!");
                 }
             }
         }
@@ -338,7 +340,7 @@ namespace PCStats
                     tooltipKey[key] = new ToolTip();
 
                 tooltipKey[key].ShowAlways = true;
-                tooltipKey[key].Show(keysDB.ContainsKey(key) ? keysDB[key].GetToolTip() : "Key wasn't pressed yet.", (TransparentPanel) sender, new Point(KeysManager.keySize, KeysManager.keySize / 2));
+                tooltipKey[key].Show(PCStats.keyboard.keys.SingleOrDefault(x => x.linkedKeys == key) != null ? PCStats.keyboard[key].GetToolTip() : "Key wasn't pressed yet.", (TransparentPanel) sender, new Point(KeysManager.keySize, KeysManager.keySize / 2));
             }
         }
 
@@ -352,11 +354,11 @@ namespace PCStats
         protected void Keyboard_Paint(object sender, PaintEventArgs e)
         {
             PictureBox o = (PictureBox) sender;
-            foreach (KeyValuePair<Keys, KeyInfo> key in keysDB)
+            foreach (var key in PCStats.keyboard.keys)
             {
-                Rectangle r = KeysManager.GetRectangle(key.Key);
+                Rectangle r = KeysManager.GetRectangle(key.linkedKeys);
                 if (new Rectangle(0, 0, o.Width, o.Height).Contains(r.X, r.Y))
-                    e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb((int) (key.Value.timesPressed * 225 / maxKeyPress), Color.Red)), r);
+                    e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb((int) (key.timesPressed * 225 / maxKeyPress), Color.Red)), r);
             }
         }
 
@@ -425,7 +427,7 @@ namespace PCStats
             if (!counting)
                 ++PCStats.mouse.cheatedTicks;
 
-            label4.Text = (counting ? "Counting!" : "Not counting!") + " " + string.Format(" {0} cheated ticks!", cheatedTicks);
+            label4.Text = (counting ? "Counting!" : "Not counting!") + " " + string.Format(" {0} cheated ticks!", PCStats.mouse.cheatedTicks);
         }
 
         public void ExtMouseMoved(object sender, MouseEventExtArgs e)
@@ -444,9 +446,9 @@ namespace PCStats
             realLastPos = mousePos;
         }
 
-        public void ExtKeyPress(object sender, KeyEventArgs e)
+        /*public void ExtKeyPress(object sender, KeyEventArgs e)
         {
-            ++PCStats.keyboard.timesPressed;
+            ++PCStats.keyboardPic.timesPressed;
             if (!keysDB.ContainsKey(e.KeyCode))
                 keysDB.Add(e.KeyCode, new KeyInfo(e.KeyCode));
             ++keysDB[e.KeyCode].timesPressed;
@@ -458,6 +460,18 @@ namespace PCStats
                 keysDB[e.KeyCode].IncrMod(ModifierKeys);
             }
             RefreshKeysNum(true);
+        }*/
+
+        public void ExtKeyPress(object sender, KeyEventArgs e)
+        {
+            //int nonVirtualKey = MapVirtualKey((uint) e.KeyCode, 2);
+            //char mappedChar = Convert.ToChar(nonVirtualKey);
+
+            //int k = (int) e.KeyCode;
+            //Console.WriteLine("CastedKeyCode: {0}; KeyValue: {1}", k, e.KeyValue);
+
+            PCStats.keyboard[e.KeyValue].SumData(e.KeyCode);
+            RefreshKeysNum(keyboardPic != null);
         }
 
         private static double GetDistance(Point p1, Point p2)
@@ -590,14 +604,21 @@ namespace PCStats
         }
     }
 
-    public class InteroperabilityAPI : frmMain
+    public class WinAPI : frmMain
     {
-        #region "Virtual key to numric value"
+        #region "Virtual key to numeric value"
+
+        /*[DllImport("user32.dll")]
+        public static extern int MapVirtualKey(uint uCode, uint uMapType);*/ //Ya habilitaré esto
 
         [DllImport("user32.dll")]
-        private static extern int MapVirtualKey(uint uCode, uint uMapType);
+        public static extern int ToUnicode(uint virtualKeyCode, uint scanCode,
+                                            byte[] keyboardState,
+                                            [Out, MarshalAs(UnmanagedType.LPWStr, SizeConst = 64)]
+                                                StringBuilder receivingBuffer,
+                                            int bufferSize, uint flags);
 
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        /*protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             const int WM_KEYDOWN = 0x100;
 
@@ -605,11 +626,28 @@ namespace PCStats
             {
                 // 2 is used to translate into an unshifted character value
                 int nonVirtualKey = MapVirtualKey((uint) keyData, 2);
-
                 //char mappedChar = Convert.ToChar(nonVirtualKey);
+
+                PCStats.keyboard[nonVirtualKey].SumData(keyData);
+                RefreshKeysNum(true);
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
+        }*/
+
+        public static string GetCharsFromKeys(Keys keys, bool shift, bool altGr)
+        {
+            var buf = new StringBuilder(256);
+            var keyboardState = new byte[256];
+            if (shift)
+                keyboardState[(int) Keys.ShiftKey] = 0xff;
+            if (altGr)
+            {
+                keyboardState[(int) Keys.ControlKey] = 0xff;
+                keyboardState[(int) Keys.Menu] = 0xff;
+            }
+            ToUnicode((uint) keys, 0, keyboardState, buf, 256, 0);
+            return buf.ToString();
         }
 
         public static int ConvertCharToInt32(string s)
@@ -617,7 +655,7 @@ namespace PCStats
             return BitConverter.ToInt32(Encoding.UTF32.GetBytes(s), 0);
         }
 
-        #endregion "Virtual key to numric value"
+        #endregion "Virtual key to numeric value"
 
         #region "System DPI"
 
@@ -996,13 +1034,37 @@ namespace PCStats
                      initCycles,
                      timeWorking;
 
-        public KeyData[] keys = new KeyData[]; // <=== length is the number of keys in keyboard
+        public List<KeyData> keys = new List<KeyData>();
 
         public KeyData this[int code]
         {
             get
             {
-                return keys.SingleOrDefault(k => k.keyCode == code);
+                var ky = keys.SingleOrDefault(k => k.keyCode == code);
+                if (ky != null)
+                    return ky;
+                else
+                {
+                    var ky2 = new KeyData(this, code);
+                    keys.Add(ky2);
+                    return keys.SingleOrDefault(x => x == ky2);
+                }
+            }
+        }
+
+        public KeyData this[Keys code]
+        {
+            get
+            {
+                var ky = keys.SingleOrDefault(k => k.linkedKeys == code);
+                if (ky != null)
+                    return ky;
+                else
+                {
+                    var ky2 = new KeyData(this, (int) code); //MapVirtualKey((uint) code, 2)
+                    keys.Add(ky2);
+                    return keys.SingleOrDefault(x => x == ky2);
+                }
             }
         }
     }
@@ -1010,20 +1072,44 @@ namespace PCStats
     //Tengo que comprobar las modifier keys, es decir, si se pulsa el Ctrl, Alt o Alt Gr al mismo tiempo y guardarlo... No se como...
     public class KeyData
     { //This don't need keyboardId, because php will introduce it later
+        private KeyboardData linkedKeyboard;
+
+        public Keys linkedKeys;
+
         public int keyCode; //Binary code for key pressed
 
-        public ulong timesPrssed, timeWorking, modifierKeysPressed;
-        public TimeSpan lastTimePressed;
+        public ulong timesPressed,
+                     timeWorking,
+                     modifierKeysPressed;
 
-        public KeyData(int k)
+        public DateTime lastTimePressed;
+
+        public KeyData(KeyboardData li, int k)
         {
+            linkedKeyboard = li;
             keyCode = k;
         }
 
-        public ulong timesPressed = 0,
-                     modifierKeys = 0;
+        public void SumData(Keys k)
+        {
+            ++linkedKeyboard.timesPressed;
+            ++timesPressed;
+            lastTimePressed = DateTime.Now;
 
-        public ModifierKey GetMod(Keys k)
+            if (Control.ModifierKeys != Keys.None)
+            {
+                //if (!keysDB[e.KeyCode].modPressed.Keys.Any(x => x.key == ModifierKeys))
+                //    keysDB[e.KeyCode].modPressed.Add(new ModifierKey(ModifierKeys), 0);
+                //keysDB[e.KeyCode].IncrMod(ModifierKeys);
+                ++modifierKeysPressed;
+            }
+            else
+            {
+                if (linkedKeys == default(Keys)) linkedKeys = k;
+            }
+        }
+
+        /*public ModifierKey GetMod(Keys k)
         {
             return modPressed.Keys.FirstOrDefault(x => x.key == k);
         }
@@ -1046,12 +1132,12 @@ namespace PCStats
             rmk.whenPressed.Add(DateTime.Now);
             modPressed.Remove(GetMod(k));
             modPressed.Add(rmk, value);
-        }
+        }*/
 
         public string GetToolTip()
         { //Create method for the name of the keys
-            string t = (DateTime.Now - whenPressed.Last()).ToString(@"d\d\ hh\h\ mm\m\ ss\s").TrimStart(' ', 'd', 'h', 'm', 's', '0');
-            return string.Format("[Key '{0}']: {1} times pressed ({4:F2}%)\n{2} mod keys pressed within it.\nPressed {3} ago.", key.ToString(), timesPressed, modifierKeys, t, timesPressed * 1d / frmMain.maxKeyPress);
+            string t = (DateTime.Now - lastTimePressed).ToString(@"d\d\ hh\h\ mm\m\ ss\s").TrimStart(' ', 'd', 'h', 'm', 's', '0');
+            return string.Format("[Key '{0}']: {1} times pressed ({4:F2}%)\n{2} mod keys pressed within it.\nPressed {3} ago.", linkedKeys.ToString(), timesPressed, modifierKeysPressed, t, timesPressed * 1d / frmMain.maxKeyPress);
         }
     }
 

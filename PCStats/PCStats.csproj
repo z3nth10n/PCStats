@@ -192,9 +192,7 @@
     <None Include="Resources\keyboard.png" />
     <Content Include="TODO.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Lang\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
